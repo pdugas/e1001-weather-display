@@ -27,3 +27,6 @@ wifi:
 # In combination with the `ap` this allows the user
 # to provision wifi credentials to the device.
 captive_portal:
+
+packages:
+  core: !include e1001-weather-display.yaml
