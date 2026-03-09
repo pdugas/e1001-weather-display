@@ -20,6 +20,12 @@ esphome:
       - component.update: battery_voltage
       - component.update: battery_level
       - component.update: sht4x_component
+      # Force at least one display refresh per boot.
+      # Home Assistant-backed sensors may not have values immediately.
+      - delay: 3s
+      - component.update: epaper_display
+      - delay: 20s
+      - component.update: epaper_display
   includes: 
     - include/weather.h
 
