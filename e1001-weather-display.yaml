@@ -5,8 +5,11 @@ substitutions:
   daily_forecast_entity_id: "sensor.daily_forecast"
   hourly_forecast_entity_id: "sensor.hourly_forecast"
   sun_info_entity_id: "sensor.daily_sun_info"
-  apparent_temp_entity_id: "sensor.apparent_temperature"
+
+  allergy_enabled: "true"
   allergy_index_entity_id: "sensor.allergy_index_today"
+
+  pollution_enabled: "true"
   pollution_level_entity_id: "sensor.u_s_air_pollution_level"
 
 esphome:
@@ -247,7 +250,8 @@ sensor:
     internal: True
   - platform: homeassistant
     id: current_apparent_temp
-    entity_id: ${apparent_temp_entity_id}
+    entity_id: ${weather_entity_id}
+    attribute: apparent_temperature
     internal: True
   - platform: homeassistant
     id: current_allergy_index
@@ -996,7 +1000,9 @@ display:
       // --------------------------------------------------------------------------------------------
       it.printf(0, 0, id(font_icon_100), TextAlign::TOP_LEFT, "%s", getConditionIcon(id(current_condition).state));
       it.printf(100, -5, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
-      it.printf(100, 60, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
+      if (id(current_apparent_temp).has_state() && !std::isnan(id(current_apparent_temp).state)) {
+        it.printf(100, 60, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
+      }
 
       it.printf(0, 115, id(font_icon_50), "\U000F059D"); // wind
       it.printf(50, 112, id(font_20), "Wind");
@@ -1012,12 +1018,24 @@ display:
       it.printf(190, 177, id(font_20), "Visibility");
       it.printf(190, 200, id(font_22_bold), "%.0fmi", id(current_visibility).state);
 
-      it.printf(0, 245, id(font_icon_50), "\U000F1885"); // flower-pollen
-      it.printf(50, 242, id(font_20), "Allergy");
-      it.printf(50, 265, id(font_22_bold), "%.0f (%s)", id(current_allergy_index).state, id(current_allergy_rating).state.c_str());
-      it.printf(140, 245, id(font_icon_50), "\U000F0A71"); // smog
-      it.printf(190, 242, id(font_20), "Pollution");
-      it.printf(190, 265, id(font_22_bold), "%s", id(current_pollution_level).state.c_str());
+      const bool allergy_enabled = strcmp("${allergy_enabled}", "true") == 0;
+      const bool pollution_enabled = strcmp("${pollution_enabled}", "true") == 0;
+      const bool show_allergy = allergy_enabled && id(current_allergy_index).has_state() && id(current_allergy_rating).has_state();
+      const bool show_pollution = pollution_enabled && id(current_pollution_level).has_state();
+
+      if (show_allergy) {
+        it.printf(0, 245, id(font_icon_50), "\U000F1885"); // flower-pollen
+        it.printf(50, 242, id(font_20), "Allergy");
+        it.printf(50, 265, id(font_22_bold), "%.0f %s", id(current_allergy_index).state, getAllergyRatingShort(id(current_allergy_rating).state));
+      }
+
+      if (show_pollution) {
+        const int x_icon = show_allergy ? 140 : 0;
+        const int x_text = show_allergy ? 190 : 50;
+        it.printf(x_icon, 245, id(font_icon_50), "\U000F0A71"); // smog
+        it.printf(x_text, 242, id(font_20), "Pollution");
+        it.printf(x_text, 265, id(font_22_bold), "%s", getPollutionLevelShort(id(current_pollution_level).state));
+      }
 
       it.printf(0, 310, id(font_icon_50), "\U000F059C"); // sunrise
       it.printf(50, 307, id(font_20), "Dawn");
