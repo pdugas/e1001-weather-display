@@ -1403,15 +1403,6 @@ display:
         it.printf(190, 200, id(font_22_bold), "%.0fmi", id(current_visibility).state);
       }
 
-      auto has_non_ws = [](const char* s) -> bool {
-        if (s == nullptr) return false;
-        while (*s) {
-          if (!isspace(static_cast<unsigned char>(*s))) return true;
-          s++;
-        }
-        return false;
-      };
-
       const bool show_allergy = has_non_ws("${allergy_index_entity_id}")
         && id(current_allergy_index).has_state()
         && id(current_allergy_rating).has_state();

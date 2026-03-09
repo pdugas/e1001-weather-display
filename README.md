@@ -5,13 +5,13 @@ This is an ESPHome project to turn Seeed Studio's E1001 into a Weather Display m
 It includes a GitHub workflow that will automatically build the configuration(s) and then deploys a simple
 website via GitHub pages that utilizes [ESP Web Tools](https://esphome.github.io/esp-web-tools/) for users to easily install onto their device.
 
-## Quickstart
+## Quickstart (Home Assistant)
 
 ### 1) Install the Home Assistant template sensors (forecast + dawn/dusk)
 
 ESPHome can’t directly consume the `weather.get_forecasts` service response, so you need a small Home Assistant Template that flattens the forecast into simple sensor attributes.
 
-- **Template file in this repo**: `[home-assistant-e1001-templates.yaml](https://raw.githubusercontent.com/pdugas/e1001-weather-display/main/home-assistant-e1001-templates.yaml)`
+- **Template file in this repo**: [`home-assistant-e1001-templates.yaml`](https://raw.githubusercontent.com/pdugas/e1001-weather-display/main/home-assistant-e1001-templates.yaml)
 - **What it creates**:
   - `sensor.e1001_daily_forecast` (attributes `day0..5`, `condition0..5`, `high0..5`, `low0..5`, `precip0..5`)
   - `sensor.e1001_hourly_forecast` (attributes `hour0..24`, `temp0..24`, `precip0..24`)
@@ -19,7 +19,7 @@ ESPHome can’t directly consume the `weather.get_forecasts` service response, s
 
 To use it:
 
-- Copy the YAML from the linked template file into Home Assistant’s `**template:`** configuration. You can do this either inline in `configuration.yml`/`configuration.yaml`, or by saving it as a separate `templates.yaml` file in your HA config directory (usually `/config/`) and including it.
+- Copy the YAML from the linked template file into Home Assistant’s **`template:`** configuration. You can do this either inline in `configuration.yml`/`configuration.yaml`, or by saving it as a separate `templates.yaml` file in your HA config directory (usually `/config/`) and including it.
 
 Example (inline in `configuration.yaml`):
 
@@ -115,8 +115,7 @@ captive_portal:
   - Reload Templates or restart Home Assistant.
   - Check the entities exist: `sensor.e1001_daily_forecast`, `sensor.e1001_hourly_forecast`, `sensor.e1001_sun_info`.
 - **Display says “Missing Home Assistant templates”**
-  - The node can’t read the expected HA entities. Verify the three `sensor.e1001_`* entities above exist and have attributes.
+  - The node can’t read the expected HA entities. Verify the three `sensor.e1001_*` entities above exist and have attributes.
   - Ensure the device is running firmware compiled from your HA ESPHome YAML (see “Flash the firmware”).
 - **No logs / device disappears**
   - Deep sleep run duration can be too short for Wi‑Fi + API + sensor reads. Increase `deep_sleep.run_duration` in your device YAML.
-
