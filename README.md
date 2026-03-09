@@ -74,5 +74,5 @@ ESPHome can’t directly consume the `weather.get_forecasts` service response, s
 To use it:
 
 - Copy/paste the contents into your HA `templates.yaml`
-- Replace every `weather.pirateweather` in that file with your weather entity (e.g. `weather.nws`)
+- Set `e1001_weather_entity` at the top of the template to your weather entity (e.g. `weather.nws`)
 - Restart Home Assistant (or reload Templates)

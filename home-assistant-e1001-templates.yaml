@@ -18,16 +18,22 @@
 - trigger:
     - platform: time_pattern
       minutes: "/30"
+    - platform: homeassistant
+      event: start
+  variables:
+    # Must match the ESPHome display substitution:
+    #   substitutions.weather_entity_id (e.g. `weather.nws`, `weather.pirateweather`)
+    e1001_weather_entity: weather.pirateweather
   action:
-    - action: weather.get_forecasts
+    - service: weather.get_forecasts
       target:
-        entity_id: weather.pirateweather
+        entity_id: "{{ e1001_weather_entity }}"
       data:
         type: daily
       response_variable: e1001_daily
-    - action: weather.get_forecasts
+    - service: weather.get_forecasts
       target:
-        entity_id: weather.pirateweather
+        entity_id: "{{ e1001_weather_entity }}"
       data:
         type: hourly
       response_variable: e1001_hourly
@@ -38,36 +44,36 @@
       attributes:
         # 4-day forecast
         day0: >
-          {% set dt = as_datetime(e1001_daily['weather.pirateweather'].forecast[0].datetime) %}
+          {% set dt = as_datetime(e1001_daily[e1001_weather_entity].forecast[0].datetime) %}
           {{ dt.strftime('%a') }}
-        condition0: "{{ e1001_daily['weather.pirateweather'].forecast[0].condition }}"
-        high0: "{{ e1001_daily['weather.pirateweather'].forecast[0].temperature | float(none) }}"
-        low0: "{{ e1001_daily['weather.pirateweather'].forecast[0].templow | float(none) }}"
-        precip0: "{{ e1001_daily['weather.pirateweather'].forecast[0].precipitation_probability | float(0) }}"
+        condition0: "{{ e1001_daily[e1001_weather_entity].forecast[0].condition }}"
+        high0: "{{ e1001_daily[e1001_weather_entity].forecast[0].temperature | float(none) }}"
+        low0: "{{ e1001_daily[e1001_weather_entity].forecast[0].templow | float(none) }}"
+        precip0: "{{ e1001_daily[e1001_weather_entity].forecast[0].precipitation_probability | float(0) }}"
 
         day1: >
-          {% set dt = as_datetime(e1001_daily['weather.pirateweather'].forecast[1].datetime) %}
+          {% set dt = as_datetime(e1001_daily[e1001_weather_entity].forecast[1].datetime) %}
           {{ dt.strftime('%a') }}
-        condition1: "{{ e1001_daily['weather.pirateweather'].forecast[1].condition }}"
-        high1: "{{ e1001_daily['weather.pirateweather'].forecast[1].temperature | float(none) }}"
-        low1: "{{ e1001_daily['weather.pirateweather'].forecast[1].templow | float(none) }}"
-        precip1: "{{ e1001_daily['weather.pirateweather'].forecast[1].precipitation_probability | float(0) }}"
+        condition1: "{{ e1001_daily[e1001_weather_entity].forecast[1].condition }}"
+        high1: "{{ e1001_daily[e1001_weather_entity].forecast[1].temperature | float(none) }}"
+        low1: "{{ e1001_daily[e1001_weather_entity].forecast[1].templow | float(none) }}"
+        precip1: "{{ e1001_daily[e1001_weather_entity].forecast[1].precipitation_probability | float(0) }}"
 
         day2: >
-          {% set dt = as_datetime(e1001_daily['weather.pirateweather'].forecast[2].datetime) %}
+          {% set dt = as_datetime(e1001_daily[e1001_weather_entity].forecast[2].datetime) %}
           {{ dt.strftime('%a') }}
-        condition2: "{{ e1001_daily['weather.pirateweather'].forecast[2].condition }}"
-        high2: "{{ e1001_daily['weather.pirateweather'].forecast[2].temperature | float(none) }}"
-        low2: "{{ e1001_daily['weather.pirateweather'].forecast[2].templow | float(none) }}"
-        precip2: "{{ e1001_daily['weather.pirateweather'].forecast[2].precipitation_probability | float(0) }}"
+        condition2: "{{ e1001_daily[e1001_weather_entity].forecast[2].condition }}"
+        high2: "{{ e1001_daily[e1001_weather_entity].forecast[2].temperature | float(none) }}"
+        low2: "{{ e1001_daily[e1001_weather_entity].forecast[2].templow | float(none) }}"
+        precip2: "{{ e1001_daily[e1001_weather_entity].forecast[2].precipitation_probability | float(0) }}"
 
         day3: >
-          {% set dt = as_datetime(e1001_daily['weather.pirateweather'].forecast[3].datetime) %}
+          {% set dt = as_datetime(e1001_daily[e1001_weather_entity].forecast[3].datetime) %}
           {{ dt.strftime('%a') }}
-        condition3: "{{ e1001_daily['weather.pirateweather'].forecast[3].condition }}"
-        high3: "{{ e1001_daily['weather.pirateweather'].forecast[3].temperature | float(none) }}"
-        low3: "{{ e1001_daily['weather.pirateweather'].forecast[3].templow | float(none) }}"
-        precip3: "{{ e1001_daily['weather.pirateweather'].forecast[3].precipitation_probability | float(0) }}"
+        condition3: "{{ e1001_daily[e1001_weather_entity].forecast[3].condition }}"
+        high3: "{{ e1001_daily[e1001_weather_entity].forecast[3].temperature | float(none) }}"
+        low3: "{{ e1001_daily[e1001_weather_entity].forecast[3].templow | float(none) }}"
+        precip3: "{{ e1001_daily[e1001_weather_entity].forecast[3].precipitation_probability | float(0) }}"
 
     - name: e1001_hourly_forecast
       unique_id: e1001_hourly_forecast
@@ -75,93 +81,97 @@
       attributes:
         # Next 13 hours (0..12)
         hour0: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[0].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[0].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp0: "{{ e1001_hourly['weather.pirateweather'].forecast[0].temperature | float(none) }}"
-        precip0: "{{ e1001_hourly['weather.pirateweather'].forecast[0].precipitation_probability | float(0) }}"
+        temp0: "{{ e1001_hourly[e1001_weather_entity].forecast[0].temperature | float(none) }}"
+        precip0: "{{ e1001_hourly[e1001_weather_entity].forecast[0].precipitation_probability | float(0) }}"
 
         hour1: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[1].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[1].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp1: "{{ e1001_hourly['weather.pirateweather'].forecast[1].temperature | float(none) }}"
-        precip1: "{{ e1001_hourly['weather.pirateweather'].forecast[1].precipitation_probability | float(0) }}"
+        temp1: "{{ e1001_hourly[e1001_weather_entity].forecast[1].temperature | float(none) }}"
+        precip1: "{{ e1001_hourly[e1001_weather_entity].forecast[1].precipitation_probability | float(0) }}"
 
         hour2: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[2].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[2].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp2: "{{ e1001_hourly['weather.pirateweather'].forecast[2].temperature | float(none) }}"
-        precip2: "{{ e1001_hourly['weather.pirateweather'].forecast[2].precipitation_probability | float(0) }}"
+        temp2: "{{ e1001_hourly[e1001_weather_entity].forecast[2].temperature | float(none) }}"
+        precip2: "{{ e1001_hourly[e1001_weather_entity].forecast[2].precipitation_probability | float(0) }}"
 
         hour3: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[3].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[3].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp3: "{{ e1001_hourly['weather.pirateweather'].forecast[3].temperature | float(none) }}"
-        precip3: "{{ e1001_hourly['weather.pirateweather'].forecast[3].precipitation_probability | float(0) }}"
+        temp3: "{{ e1001_hourly[e1001_weather_entity].forecast[3].temperature | float(none) }}"
+        precip3: "{{ e1001_hourly[e1001_weather_entity].forecast[3].precipitation_probability | float(0) }}"
 
         hour4: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[4].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[4].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp4: "{{ e1001_hourly['weather.pirateweather'].forecast[4].temperature | float(none) }}"
-        precip4: "{{ e1001_hourly['weather.pirateweather'].forecast[4].precipitation_probability | float(0) }}"
+        temp4: "{{ e1001_hourly[e1001_weather_entity].forecast[4].temperature | float(none) }}"
+        precip4: "{{ e1001_hourly[e1001_weather_entity].forecast[4].precipitation_probability | float(0) }}"
 
         hour5: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[5].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[5].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp5: "{{ e1001_hourly['weather.pirateweather'].forecast[5].temperature | float(none) }}"
-        precip5: "{{ e1001_hourly['weather.pirateweather'].forecast[5].precipitation_probability | float(0) }}"
+        temp5: "{{ e1001_hourly[e1001_weather_entity].forecast[5].temperature | float(none) }}"
+        precip5: "{{ e1001_hourly[e1001_weather_entity].forecast[5].precipitation_probability | float(0) }}"
 
         hour6: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[6].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[6].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp6: "{{ e1001_hourly['weather.pirateweather'].forecast[6].temperature | float(none) }}"
-        precip6: "{{ e1001_hourly['weather.pirateweather'].forecast[6].precipitation_probability | float(0) }}"
+        temp6: "{{ e1001_hourly[e1001_weather_entity].forecast[6].temperature | float(none) }}"
+        precip6: "{{ e1001_hourly[e1001_weather_entity].forecast[6].precipitation_probability | float(0) }}"
 
         hour7: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[7].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[7].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp7: "{{ e1001_hourly['weather.pirateweather'].forecast[7].temperature | float(none) }}"
-        precip7: "{{ e1001_hourly['weather.pirateweather'].forecast[7].precipitation_probability | float(0) }}"
+        temp7: "{{ e1001_hourly[e1001_weather_entity].forecast[7].temperature | float(none) }}"
+        precip7: "{{ e1001_hourly[e1001_weather_entity].forecast[7].precipitation_probability | float(0) }}"
 
         hour8: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[8].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[8].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp8: "{{ e1001_hourly['weather.pirateweather'].forecast[8].temperature | float(none) }}"
-        precip8: "{{ e1001_hourly['weather.pirateweather'].forecast[8].precipitation_probability | float(0) }}"
+        temp8: "{{ e1001_hourly[e1001_weather_entity].forecast[8].temperature | float(none) }}"
+        precip8: "{{ e1001_hourly[e1001_weather_entity].forecast[8].precipitation_probability | float(0) }}"
 
         hour9: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[9].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[9].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp9: "{{ e1001_hourly['weather.pirateweather'].forecast[9].temperature | float(none) }}"
-        precip9: "{{ e1001_hourly['weather.pirateweather'].forecast[9].precipitation_probability | float(0) }}"
+        temp9: "{{ e1001_hourly[e1001_weather_entity].forecast[9].temperature | float(none) }}"
+        precip9: "{{ e1001_hourly[e1001_weather_entity].forecast[9].precipitation_probability | float(0) }}"
 
         hour10: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[10].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[10].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp10: "{{ e1001_hourly['weather.pirateweather'].forecast[10].temperature | float(none) }}"
-        precip10: "{{ e1001_hourly['weather.pirateweather'].forecast[10].precipitation_probability | float(0) }}"
+        temp10: "{{ e1001_hourly[e1001_weather_entity].forecast[10].temperature | float(none) }}"
+        precip10: "{{ e1001_hourly[e1001_weather_entity].forecast[10].precipitation_probability | float(0) }}"
 
         hour11: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[11].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[11].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp11: "{{ e1001_hourly['weather.pirateweather'].forecast[11].temperature | float(none) }}"
-        precip11: "{{ e1001_hourly['weather.pirateweather'].forecast[11].precipitation_probability | float(0) }}"
+        temp11: "{{ e1001_hourly[e1001_weather_entity].forecast[11].temperature | float(none) }}"
+        precip11: "{{ e1001_hourly[e1001_weather_entity].forecast[11].precipitation_probability | float(0) }}"
 
         hour12: >
-          {% set dt = as_datetime(e1001_hourly['weather.pirateweather'].forecast[12].datetime) %}
+          {% set dt = as_datetime(e1001_hourly[e1001_weather_entity].forecast[12].datetime) %}
           {{ dt.strftime('%-I%p') }}
-        temp12: "{{ e1001_hourly['weather.pirateweather'].forecast[12].temperature | float(none) }}"
-        precip12: "{{ e1001_hourly['weather.pirateweather'].forecast[12].precipitation_probability | float(0) }}"
+        temp12: "{{ e1001_hourly[e1001_weather_entity].forecast[12].temperature | float(none) }}"
+        precip12: "{{ e1001_hourly[e1001_weather_entity].forecast[12].precipitation_probability | float(0) }}"
 
 - trigger:
     - platform: time_pattern
       minutes: "/30"
     - platform: homeassistant
       event: start
+  variables:
+    # Must match the ESPHome display substitution:
+    #   substitutions.sun_entity_id (usually `sun.sun`)
+    e1001_sun_entity: sun.sun
   sensor:
     - name: e1001_sun_info
       unique_id: e1001_sun_info
       state: "{{ now().isoformat() }}"
       attributes:
-        dawn: "{{ as_timestamp(state_attr('sun.sun','next_dawn')) | timestamp_custom('%I:%M%p', True) }}"
-        dusk: "{{ as_timestamp(state_attr('sun.sun','next_dusk')) | timestamp_custom('%I:%M%p', True) }}"
+        dawn: "{{ as_timestamp(state_attr(e1001_sun_entity,'next_dawn')) | timestamp_custom('%I:%M%p', True) }}"
+        dusk: "{{ as_timestamp(state_attr(e1001_sun_entity,'next_dusk')) | timestamp_custom('%I:%M%p', True) }}"
 
