@@ -1,6 +1,17 @@
+substitutions:
+  location_name: "Canton, Georgia"
+
+  weather_entity_id: "weather.nws"
+  daily_forecast_entity_id: "sensor.daily_forecast"
+  hourly_forecast_entity_id: "sensor.hourly_forecast"
+  sun_info_entity_id: "sensor.daily_sun_info"
+  apparent_temp_entity_id: "sensor.apparent_temperature"
+  allergy_index_entity_id: "sensor.allergy_index_today"
+  pollution_level_entity_id: "sensor.u_s_air_pollution_level"
+
 esphome:
-  name: e1001-weather-display
-  friendly_name: E1000 Weather Display
+  project:
+    name: esphome.e1001-weather-display
   on_boot:
     priority: 600
     then:
@@ -11,30 +22,6 @@ esphome:
       - component.update: sht4x_component
   includes: 
     - include/weather.h
-
-esp32:
-  board: esp32-s3-devkitc-1
-  framework:
-    type: esp-idf
-
-logger:
-
-api:
-  encryption:
-    key: "z5PKBHWMOVhGnOqL5Bt5nmk2UGixaGx2QgtyE5Q4rm0="
-
-ota:
-  - platform: esphome
-    password: "ed336f1f1dce7c5d89fcc6a4de637104"
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "E1001 Weather Display Fallback Hotspot"
-    password: "KGdsajtyYTEv76Ka"
-
-captive_portal:
 
 deep_sleep:
   id: deep_sleep_1
@@ -215,7 +202,7 @@ sensor:
   # current
   - platform: homeassistant
     id: current_temp
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: temperature
     internal: True
     on_value: 
@@ -223,377 +210,377 @@ sensor:
         - component.update: epaper_display
   - platform: homeassistant
     id: current_humidity
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: humidity
     internal: True
   - platform: homeassistant
     id: current_pressure
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: pressure
     internal: True
   - platform: homeassistant
     id: current_wind_speed
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: wind_speed
     internal: True
   - platform: homeassistant
     id: current_wind_bearing
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: wind_bearing
     internal: True
   - platform: homeassistant
     id: current_visibility
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: visibility
     internal: True
   - platform: homeassistant
     id: current_precipitation
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: precipitation
     internal: True
   - platform: homeassistant
     id: current_apparent_temp
-    entity_id: sensor.apparent_temperature
+    entity_id: ${apparent_temp_entity_id}
     internal: True
   - platform: homeassistant
     id: current_allergy_index
-    entity_id: sensor.allergy_index_today
+    entity_id: ${allergy_index_entity_id}
     internal: True
 
   # daily temps
   - platform: homeassistant
     id: daily_tempAM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM0
     internal: true
   - platform: homeassistant
     id: daily_tempPM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM0
     internal: true
   - platform: homeassistant
     id: daily_tempAM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM1
     internal: true
   - platform: homeassistant
     id: daily_tempPM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM1
     internal: true
   - platform: homeassistant
     id: daily_tempAM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM2
     internal: true
   - platform: homeassistant
     id: daily_tempPM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM2
     internal: true
   - platform: homeassistant
     id: daily_tempAM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM3
     internal: true
   - platform: homeassistant
     id: daily_tempPM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM3
     internal: true
 
   # daily precip
   - platform: homeassistant
     id: daily_precipAM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM0
     internal: true
   - platform: homeassistant
     id: daily_precipPM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM0
     internal: true
   - platform: homeassistant
     id: daily_precipAM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM1
     internal: true
   - platform: homeassistant
     id: daily_precipPM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM1
     internal: true
   - platform: homeassistant
     id: daily_precipAM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM2
     internal: true
   - platform: homeassistant
     id: daily_precipPM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM2
     internal: true
   - platform: homeassistant
     id: daily_precipAM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM3
     internal: true
   - platform: homeassistant
     id: daily_precipPM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM3
     internal: true
 
   # hourly temps
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp0
     id: hourly_temp0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp1
     id: hourly_temp1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp2
     id: hourly_temp2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp3
     id: hourly_temp3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp4
     id: hourly_temp4
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp5
     id: hourly_temp5
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp6
     id: hourly_temp6
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp7
     id: hourly_temp7
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp8
     id: hourly_temp8
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp9
     id: hourly_temp9
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp10
     id: hourly_temp10
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp11
     id: hourly_temp11
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp12
     id: hourly_temp12
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp13
     id: hourly_temp13
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp14
     id: hourly_temp14
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp15
     id: hourly_temp15
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp16
     id: hourly_temp16
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp17
     id: hourly_temp17
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp18
     id: hourly_temp18
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp19
     id: hourly_temp19
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp20
     id: hourly_temp20
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp21
     id: hourly_temp21
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp22
     id: hourly_temp22
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp23
     id: hourly_temp23
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp24
     id: hourly_temp24
     internal: true
 
   # hourly precips
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip0
     id: hourly_precip0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip1
     id: hourly_precip1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip2
     id: hourly_precip2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip3
     id: hourly_precip3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip4
     id: hourly_precip4
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip5
     id: hourly_precip5
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip6
     id: hourly_precip6
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip7
     id: hourly_precip7
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip8
     id: hourly_precip8
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip9
     id: hourly_precip9
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip10
     id: hourly_precip10
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip11
     id: hourly_precip11
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip12
     id: hourly_precip12
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip13
     id: hourly_precip13
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip14
     id: hourly_precip14
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip15
     id: hourly_precip15
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip16
     id: hourly_precip16
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip17
     id: hourly_precip17
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip18
     id: hourly_precip18
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip19
     id: hourly_precip19
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip20
     id: hourly_precip20
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip21
     id: hourly_precip21
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip22
     id: hourly_precip22
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip23
     id: hourly_precip23
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip24
     id: hourly_precip24
     internal: true
@@ -602,215 +589,215 @@ text_sensor:
   # current
   - platform: homeassistant
     id: current_condition
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     internal: True
   - platform: homeassistant
     id: current_dawn
-    entity_id: sensor.daily_sun_info
+    entity_id: ${sun_info_entity_id}
     attribute: dawn
     internal: True
   - platform: homeassistant
     id: current_dusk
-    entity_id: sensor.daily_sun_info
+    entity_id: ${sun_info_entity_id}
     attribute: dusk
     internal: True
   - platform: homeassistant
     id: current_allergy_rating
-    entity_id: sensor.allergy_index_today
+    entity_id: ${allergy_index_entity_id}
     attribute: rating
     internal: True
   - platform: homeassistant
     id: current_pollution_level
-    entity_id: sensor.u_s_air_pollution_level
+    entity_id: ${pollution_level_entity_id}
     internal: True
 
   # daily days
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day0
     id: daily_day0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day1
     id: daily_day1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day2
     id: daily_day2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day3
     id: daily_day3
     internal: true
 
   # daily conditions
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM0
     id: daily_conditionAM0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM0
     id: daily_conditionPM0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM1
     id: daily_conditionAM1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM1
     id: daily_conditionPM1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM2
     id: daily_conditionAM2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM2
     id: daily_conditionPM2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM3
     id: daily_conditionAM3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM3
     id: daily_conditionPM3
     internal: true
 
   # hourly hours
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour0
     id: hourly_hour0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour1
     id: hourly_hour1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour2
     id: hourly_hour2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour3
     id: hourly_hour3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour4
     id: hourly_hour4
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour5
     id: hourly_hour5
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour6
     id: hourly_hour6
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour7
     id: hourly_hour7
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour8
     id: hourly_hour8
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour9
     id: hourly_hour9
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour10
     id: hourly_hour10
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour11
     id: hourly_hour11
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour12
     id: hourly_hour12
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour13
     id: hourly_hour13
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour14
     id: hourly_hour14
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour15
     id: hourly_hour15
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour16
     id: hourly_hour16
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour17
     id: hourly_hour17
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour18
     id: hourly_hour18
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour19
     id: hourly_hour19
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour20
     id: hourly_hour20
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour21
     id: hourly_hour21
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour22
     id: hourly_hour22
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour23
     id: hourly_hour23
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour24
     id: hourly_hour24
     internal: true
@@ -852,7 +839,7 @@ display:
 
       // Title/Subtitle
       // --------------------------------------------------------------------------------------------
-      const char* titleStr = "Canton, Georgia";
+      const char* titleStr = "${location_name}";
       id(font_40_bold).measure(titleStr, &measWidth, &measXOoffset, &measBaseline, &measHeight);
       it.printf(right, top-measHeight+measBaseline, id(font_40_bold), TextAlign::TOP_RIGHT, titleStr);
       char dateStr[32];

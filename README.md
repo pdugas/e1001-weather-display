@@ -9,7 +9,9 @@ website via GitHub pages that utilizes [ESP Web Tools](https://esphome.github.io
 
 ## Using this repo from ESPHome
 
-The “core” config lives in `e1001-weather-display.yaml`. The board-specific entrypoints include that core file:
+The “core” config lives in `e1001-weather-display.yaml` (display, sensors, data-source substitutions). It intentionally **does not** define Wi-Fi, API encryption, or OTA passwords — those should live in your device YAML.
+
+The board-specific entrypoints include that core file:
 
 - `e1001-weather-display-esp32.yaml`
 - `e1001-weather-display-esp32-c3.yaml`
@@ -42,3 +44,21 @@ packages:
 ```
 
 This is also what the `*.factory.yaml` configurations use via `dashboard_import`.
+
+## Configuring the location and data sources
+
+The display title and Home Assistant entity IDs are configurable via `substitutions`. Put these in your device YAML (the one that imports this repo via `packages:`), and adjust as needed:
+
+```yaml
+substitutions:
+  location_name: "Canton, Georgia"
+
+  weather_entity_id: "weather.nws"
+  daily_forecast_entity_id: "sensor.daily_forecast"
+  hourly_forecast_entity_id: "sensor.hourly_forecast"
+  sun_info_entity_id: "sensor.daily_sun_info"
+  apparent_temp_entity_id: "sensor.apparent_temperature"
+  allergy_index_entity_id: "sensor.allergy_index_today"
+  pollution_level_entity_id: "sensor.u_s_air_pollution_level"
+```
+
