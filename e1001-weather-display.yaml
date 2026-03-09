@@ -298,6 +298,16 @@ sensor:
     entity_id: ${daily_forecast_entity_id}
     attribute: tempPM3
     internal: true
+  - platform: homeassistant
+    id: daily_tempAM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: tempAM4
+    internal: true
+  - platform: homeassistant
+    id: daily_tempPM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: tempPM4
+    internal: true
 
   # daily precip
   - platform: homeassistant
@@ -339,6 +349,16 @@ sensor:
     id: daily_precipPM3
     entity_id: ${daily_forecast_entity_id}
     attribute: precipPM3
+    internal: true
+  - platform: homeassistant
+    id: daily_precipAM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precipAM4
+    internal: true
+  - platform: homeassistant
+    id: daily_precipPM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precipPM4
     internal: true
 
   # daily forecast (single) - preferred when available
@@ -401,6 +421,21 @@ sensor:
     id: daily_precip3
     entity_id: ${daily_forecast_entity_id}
     attribute: precip3
+    internal: true
+  - platform: homeassistant
+    id: daily_high4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: high4
+    internal: true
+  - platform: homeassistant
+    id: daily_low4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: low4
+    internal: true
+  - platform: homeassistant
+    id: daily_precip4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precip4
     internal: true
 
   # hourly temps
@@ -713,6 +748,11 @@ text_sensor:
     attribute: day3
     id: daily_day3
     internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: day4
+    id: daily_day4
+    internal: true
 
   # daily conditions
   - platform: homeassistant
@@ -734,6 +774,11 @@ text_sensor:
     entity_id: ${daily_forecast_entity_id}
     attribute: condition3
     id: daily_condition3
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: condition4
+    id: daily_condition4
     internal: true
 
   - platform: homeassistant
@@ -775,6 +820,16 @@ text_sensor:
     entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM3
     id: daily_conditionPM3
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: conditionAM4
+    id: daily_conditionAM4
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: conditionPM4
+    id: daily_conditionPM4
     internal: true
 
   # hourly hours
@@ -1064,11 +1119,15 @@ display:
 
       // Daily
       // --------------------------------------------------------------------------------------------
-      std::string daily_days[4]         = { id(daily_day0).state, id(daily_day1).state, id(daily_day2).state, id(daily_day3).state };
+      std::string daily_days[5]         = { id(daily_day0).state, id(daily_day1).state, id(daily_day2).state, id(daily_day3).state, id(daily_day4).state };
       const bool daily_v2 = id(daily_condition0).has_state()
         && ok_float(id(daily_high0).state)
         && ok_float(id(daily_low0).state)
         && ok_float(id(daily_precip0).state);
+
+      // Nudge daily tiles upward so the precip text doesn't collide with the hourly plot.
+      id(font_16).measure("0", &measWidth, &measXOoffset, &measBaseline, &measHeight);
+      const int daily_tile_y_shift = measHeight;
 
       bool freeze_warning = false;
       const bool daily_compat = id(daily_conditionAM0).has_state()
@@ -1084,23 +1143,26 @@ display:
         it.printf(542, 160, id(font_16), TextAlign::CENTER, "Install: home-assistant-e1001-templates.yaml");
         it.printf(542, 180, id(font_16), TextAlign::CENTER, "See README: Home Assistant template sensors");
       } else if (daily_v2) {
-        std::string daily_conditions[4] = { id(daily_condition0).state, id(daily_condition1).state, id(daily_condition2).state, id(daily_condition3).state };
-        float daily_highs[4]            = { id(daily_high0).state, id(daily_high1).state, id(daily_high2).state, id(daily_high3).state };
-        float daily_lows[4]             = { id(daily_low0).state, id(daily_low1).state, id(daily_low2).state, id(daily_low3).state };
-        float daily_precips[4]          = { id(daily_precip0).state, id(daily_precip1).state, id(daily_precip2).state, id(daily_precip3).state };
+        std::string daily_conditions[5] = { id(daily_condition0).state, id(daily_condition1).state, id(daily_condition2).state, id(daily_condition3).state, id(daily_condition4).state };
+        float daily_highs[5]            = { id(daily_high0).state, id(daily_high1).state, id(daily_high2).state, id(daily_high3).state, id(daily_high4).state };
+        float daily_lows[5]             = { id(daily_low0).state, id(daily_low1).state, id(daily_low2).state, id(daily_low3).state, id(daily_low4).state };
+        float daily_precips[5]          = { id(daily_precip0).state, id(daily_precip1).state, id(daily_precip2).state, id(daily_precip3).state, id(daily_precip4).state };
 
-        for (int i = 0; i < 4; i++) {
+        const int daily_tile_base_x = 320;
+        const int daily_tile_step_x = 110;
+        for (int i = 0; i < 5; i++) {
+          const int daily_tile_x = daily_tile_base_x + i * daily_tile_step_x;
           if (!daily_days[i].empty()) {
-            it.printf(355+i*125,  90, id(font_30_bold), TextAlign::CENTER, "%s", daily_days[i].c_str());
+            it.printf(daily_tile_x,  90, id(font_30_bold), TextAlign::CENTER, "%s", daily_days[i].c_str());
           }
           if (!daily_conditions[i].empty()) {
-            it.printf(355+i*125, 150, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(daily_conditions[i]));
+            it.printf(daily_tile_x, 150 - daily_tile_y_shift, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(daily_conditions[i]));
           }
           if (ok_float(daily_highs[i]) && ok_float(daily_lows[i])) {
-            it.printf(355+i*125, 185, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", daily_highs[i], daily_lows[i]);
+            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", daily_highs[i], daily_lows[i]);
           }
           if (ok_float(daily_precips[i])) {
-            it.printf(355+i*125, 205, id(font_16), TextAlign::CENTER, "%.0f%%", daily_precips[i]);
+            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f%%", daily_precips[i]);
           }
 
           if (!freeze_warning && ok_float(daily_lows[i]) && (daily_lows[i] <= 32)) {
@@ -1109,30 +1171,33 @@ display:
         }
       } else {
         // Back-compat: collapse twice-daily (AM/PM) into a single daily summary.
-        std::string daily_conditionsAM[4] = { id(daily_conditionAM0).state, id(daily_conditionAM1).state, id(daily_conditionAM2).state, id(daily_conditionAM3).state };
-        std::string daily_conditionsPM[4] = { id(daily_conditionPM0).state, id(daily_conditionPM1).state, id(daily_conditionPM2).state, id(daily_conditionPM3).state };
-        float daily_tempsAM[4]            = { id(daily_tempAM0).state, id(daily_tempAM1).state, id(daily_tempAM2).state, id(daily_tempAM3).state };
-        float daily_tempsPM[4]            = { id(daily_tempPM0).state, id(daily_tempPM1).state, id(daily_tempPM2).state, id(daily_tempPM3).state };
-        float daily_precipsAM[4]          = { id(daily_precipAM0).state, id(daily_precipAM1).state, id(daily_precipAM2).state, id(daily_precipAM3).state };
-        float daily_precipsPM[4]          = { id(daily_precipPM0).state, id(daily_precipPM1).state, id(daily_precipPM2).state, id(daily_precipPM3).state };
+        std::string daily_conditionsAM[5] = { id(daily_conditionAM0).state, id(daily_conditionAM1).state, id(daily_conditionAM2).state, id(daily_conditionAM3).state, id(daily_conditionAM4).state };
+        std::string daily_conditionsPM[5] = { id(daily_conditionPM0).state, id(daily_conditionPM1).state, id(daily_conditionPM2).state, id(daily_conditionPM3).state, id(daily_conditionPM4).state };
+        float daily_tempsAM[5]            = { id(daily_tempAM0).state, id(daily_tempAM1).state, id(daily_tempAM2).state, id(daily_tempAM3).state, id(daily_tempAM4).state };
+        float daily_tempsPM[5]            = { id(daily_tempPM0).state, id(daily_tempPM1).state, id(daily_tempPM2).state, id(daily_tempPM3).state, id(daily_tempPM4).state };
+        float daily_precipsAM[5]          = { id(daily_precipAM0).state, id(daily_precipAM1).state, id(daily_precipAM2).state, id(daily_precipAM3).state, id(daily_precipAM4).state };
+        float daily_precipsPM[5]          = { id(daily_precipPM0).state, id(daily_precipPM1).state, id(daily_precipPM2).state, id(daily_precipPM3).state, id(daily_precipPM4).state };
 
-        for (int i = 0; i < 4; i++) {
+        const int daily_tile_base_x = 320;
+        const int daily_tile_step_x = 110;
+        for (int i = 0; i < 5; i++) {
+          const int daily_tile_x = daily_tile_base_x + i * daily_tile_step_x;
           const float high_temp = daily_tempsAM[i] > daily_tempsPM[i] ? daily_tempsAM[i] : daily_tempsPM[i];
           const float low_temp = daily_tempsAM[i] < daily_tempsPM[i] ? daily_tempsAM[i] : daily_tempsPM[i];
           const float precip_chance = daily_precipsAM[i] > daily_precipsPM[i] ? daily_precipsAM[i] : daily_precipsPM[i];
           const std::string &day_condition = (daily_precipsPM[i] >= daily_precipsAM[i]) ? daily_conditionsPM[i] : daily_conditionsAM[i];
 
           if (!daily_days[i].empty()) {
-            it.printf(355+i*125,  90, id(font_30_bold), TextAlign::CENTER, "%s", daily_days[i].c_str());
+            it.printf(daily_tile_x,  90, id(font_30_bold), TextAlign::CENTER, "%s", daily_days[i].c_str());
           }
           if (!day_condition.empty()) {
-            it.printf(355+i*125, 150, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(day_condition));
+            it.printf(daily_tile_x, 150 - daily_tile_y_shift, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(day_condition));
           }
           if (ok_float(high_temp) && ok_float(low_temp)) {
-            it.printf(355+i*125, 185, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", high_temp, low_temp);
+            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", high_temp, low_temp);
           }
           if (ok_float(precip_chance)) {
-            it.printf(355+i*125, 205, id(font_16), TextAlign::CENTER, "%.0f%%", precip_chance);
+            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f%%", precip_chance);
           }
 
           if (!freeze_warning && ok_float(low_temp) && (low_temp <= 32)) {
