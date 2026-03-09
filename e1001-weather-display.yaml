@@ -844,6 +844,8 @@ display:
       // for use with font::Font::measure()
       int measWidth, measXOoffset, measBaseline, measHeight;
 
+      auto ok_float = [](float v) -> bool { return v == v; };  // NaN check
+
       auto getConditionIcon = [](const std::string &condition) -> const char* {
         if (condition == "sunny") return "\U000F0599";
         if (condition == "partlycloudy") return "\U000F0595";
@@ -1045,24 +1047,34 @@ display:
       // Current
       // --------------------------------------------------------------------------------------------
       it.printf(0, 0, id(font_icon_100), TextAlign::TOP_LEFT, "%s", getConditionIcon(id(current_condition).state));
-      it.printf(100, -5, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
-      if (id(current_apparent_temp).has_state() && id(current_apparent_temp).state == id(current_apparent_temp).state) {
+      if (id(current_temp).has_state() && ok_float(id(current_temp).state)) {
+        it.printf(100, -5, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
+      }
+      if (id(current_apparent_temp).has_state() && ok_float(id(current_apparent_temp).state)) {
         it.printf(100, 60, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
       }
 
       it.printf(0, 115, id(font_icon_50), "\U000F059D"); // wind
       it.printf(50, 112, id(font_20), "Wind");
-      it.printf(50, 135, id(font_22_bold), "%.0fmph", id(current_wind_speed).state);
+      if (id(current_wind_speed).has_state() && ok_float(id(current_wind_speed).state)) {
+        it.printf(50, 135, id(font_22_bold), "%.0fmph", id(current_wind_speed).state);
+      }
       it.printf(140, 115, id(font_icon_50), "\U000F058E"); // water-percent
       it.printf(190, 112, id(font_20), "Humidity");
-      it.printf(190, 135, id(font_22_bold), "%.0f%%", id(current_humidity).state);
+      if (id(current_humidity).has_state() && ok_float(id(current_humidity).state)) {
+        it.printf(190, 135, id(font_22_bold), "%.0f%%", id(current_humidity).state);
+      }
 
       it.printf(0, 180, id(font_icon_50), "\U000F0875"); // gauge-low
       it.printf(50, 177, id(font_20), "Pressure");
-      it.printf(50, 200, id(font_22_bold), "%.0finHg", id(current_pressure).state);
+      if (id(current_pressure).has_state() && ok_float(id(current_pressure).state)) {
+        it.printf(50, 200, id(font_22_bold), "%.0finHg", id(current_pressure).state);
+      }
       it.printf(140, 180, id(font_icon_50), "\U000F0208"); // eye
       it.printf(190, 177, id(font_20), "Visibility");
-      it.printf(190, 200, id(font_22_bold), "%.0fmi", id(current_visibility).state);
+      if (id(current_visibility).has_state() && ok_float(id(current_visibility).state)) {
+        it.printf(190, 200, id(font_22_bold), "%.0fmi", id(current_visibility).state);
+      }
 
       const bool allergy_enabled = strcmp("${allergy_enabled}", "true") == 0;
       const bool pollution_enabled = strcmp("${pollution_enabled}", "true") == 0;
@@ -1094,7 +1106,11 @@ display:
       it.rectangle(0, 415, 280, 2);
       it.printf(0, 425, id(font_icon_50), "\U000F050F"); // thermometer
       it.printf(45, 422, id(font_20), "Temp");
-      it.printf(45, 445, id(font_22_bold), "%.0f°F", id(sht4x_temp).state * 9.0/5.0 + 32.0);
+      if (id(sht4x_temp).has_state() && ok_float(id(sht4x_temp).state)) {
+        it.printf(45, 445, id(font_22_bold), "%.0f°F", id(sht4x_temp).state * 9.0/5.0 + 32.0);
+      }
       it.printf(140, 425, id(font_icon_50), "\U000F058E"); // water-percent
       it.printf(185, 422, id(font_20), "Humidity");
-      it.printf(185, 445, id(font_22_bold), "%.0f%%", id(sht4x_hum).state);
+      if (id(sht4x_hum).has_state() && ok_float(id(sht4x_hum).state)) {
+        it.printf(185, 445, id(font_22_bold), "%.0f%%", id(sht4x_hum).state);
+      }
