@@ -30,9 +30,6 @@ esphome:
       - component.update: epaper_display
       - delay: 20s
       - component.update: epaper_display
-  includes: 
-    - include/weather.h
-
 deep_sleep:
   id: deep_sleep_1
   run_duration: 30s 
@@ -842,6 +839,47 @@ display:
       // for use with font::Font::measure()
       int measWidth, measXOoffset, measBaseline, measHeight;
 
+      auto getConditionIcon = [](const std::string &condition) -> const char* {
+        if (condition == "sunny") return "\U000F0599";
+        if (condition == "partlycloudy") return "\U000F0595";
+        if (condition == "cloudy") return "\U000F0590";
+        if (condition == "rainy") return "\U000F0597";
+        if (condition == "snowy") return "\U000F0598";
+        if (condition == "pouring") return "\U000F0596";
+        if (condition == "lightning") return "\U000F0593";
+        if (condition == "clear-night") return "\U000F0594";
+        if (condition == "night-partlycloudy") return "\U000F0F31";
+        if (condition == "fog") return "\U000F0591";
+        if (condition == "hail") return "\U000F0592";
+        if (condition == "lightning-rainy") return "\U000F067E";
+        if (condition == "snowy-rainy") return "\U000F0F35";
+        if (condition == "windy") return "\U000F059D";
+        if (condition == "windy-variant") return "\U000F059E";
+        if (condition == "exceptional") return "\U000F0F2F";
+        return "\U000F0F2F";
+      };
+
+      auto getAllergyRatingShort = [](const std::string &rating) -> const char* {
+        // IQVIA ratings: Low, Low/Medium, Medium, Medium/High, High.
+        if (rating == "Low") return "Low";
+        if (rating == "Low/Medium") return "MedLow";
+        if (rating == "Medium") return "Med";
+        if (rating == "Medium/High") return "MedHigh";
+        if (rating == "High") return "High";
+        return "";
+      };
+
+      auto getPollutionLevelShort = [](const std::string &level) -> const char* {
+        // AirVisual enum values: good, moderate, unhealthy_sensitive, unhealthy, very_unhealthy, hazardous
+        if (level == "good") return "Good";
+        if (level == "moderate") return "Mod";
+        if (level == "unhealthy_sensitive") return "USG";
+        if (level == "unhealthy") return "Unh";
+        if (level == "very_unhealthy") return "VUnh";
+        if (level == "hazardous") return "Haz";
+        return "";
+      };
+
       // positions
       int left = 0;
       int right = 799;
@@ -1000,7 +1038,7 @@ display:
       // --------------------------------------------------------------------------------------------
       it.printf(0, 0, id(font_icon_100), TextAlign::TOP_LEFT, "%s", getConditionIcon(id(current_condition).state));
       it.printf(100, -5, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
-      if (id(current_apparent_temp).has_state() && !std::isnan(id(current_apparent_temp).state)) {
+      if (id(current_apparent_temp).has_state() && id(current_apparent_temp).state == id(current_apparent_temp).state) {
         it.printf(100, 60, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
       }
 
