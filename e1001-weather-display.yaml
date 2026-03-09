@@ -930,6 +930,10 @@ display:
       auto now = id(ha_time).now();
       struct tm timeinfo = now.to_c_tm();
 
+      // Clear the framebuffer every refresh so previously-rendered values
+      // (like "nan") don't stick around when data becomes unavailable.
+      it.fill(COLOR_OFF);
+
       // for use with font::Font::measure()
       int measWidth, measXOoffset, measBaseline, measHeight;
 
