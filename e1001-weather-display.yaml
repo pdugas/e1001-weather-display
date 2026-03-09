@@ -12,6 +12,7 @@ substitutions:
 esphome:
   project:
     name: esphome.e1001-weather-display
+    version: dev
   on_boot:
     priority: 600
     then:
