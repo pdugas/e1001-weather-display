@@ -1,6 +1,21 @@
+substitutions:
+  location_name: "Canton, Georgia"
+
+  weather_entity_id: "weather.nws"
+  sun_entity_id: "sun.sun"
+  # Provide flattened daily forecast attributes (see `home-assistant-e1001-templates.yaml`)
+  daily_forecast_entity_id: "sensor.e1001_daily_forecast"
+  hourly_forecast_entity_id: "sensor.e1001_hourly_forecast"
+  sun_info_entity_id: "sensor.e1001_sun_info"
+
+  # Optional integrations: set the entity id to enable, or leave empty to disable.
+  allergy_index_entity_id: ""
+  pollution_level_entity_id: ""
+
 esphome:
-  name: e1001-weather-display
-  friendly_name: E1000 Weather Display
+  project:
+    name: esphome.e1001-weather-display
+    version: dev
   on_boot:
     priority: 600
     then:
@@ -9,33 +24,12 @@ esphome:
       - component.update: battery_voltage
       - component.update: battery_level
       - component.update: sht4x_component
-  includes: 
-    - include/weather.h
-
-esp32:
-  board: esp32-s3-devkitc-1
-  framework:
-    type: esp-idf
-
-logger:
-
-api:
-  encryption:
-    key: "z5PKBHWMOVhGnOqL5Bt5nmk2UGixaGx2QgtyE5Q4rm0="
-
-ota:
-  - platform: esphome
-    password: "ed336f1f1dce7c5d89fcc6a4de637104"
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "E1001 Weather Display Fallback Hotspot"
-    password: "KGdsajtyYTEv76Ka"
-
-captive_portal:
-
+      # Force at least one display refresh per boot.
+      # Home Assistant-backed sensors may not have values immediately.
+      - delay: 3s
+      - component.update: epaper_display
+      - delay: 20s
+      - component.update: epaper_display
 deep_sleep:
   id: deep_sleep_1
   run_duration: 30s 
@@ -215,7 +209,7 @@ sensor:
   # current
   - platform: homeassistant
     id: current_temp
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: temperature
     internal: True
     on_value: 
@@ -223,377 +217,510 @@ sensor:
         - component.update: epaper_display
   - platform: homeassistant
     id: current_humidity
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: humidity
     internal: True
   - platform: homeassistant
     id: current_pressure
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: pressure
     internal: True
   - platform: homeassistant
     id: current_wind_speed
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: wind_speed
     internal: True
   - platform: homeassistant
     id: current_wind_bearing
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: wind_bearing
     internal: True
   - platform: homeassistant
     id: current_visibility
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: visibility
     internal: True
   - platform: homeassistant
     id: current_precipitation
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     attribute: precipitation
     internal: True
   - platform: homeassistant
     id: current_apparent_temp
-    entity_id: sensor.apparent_temperature
+    entity_id: ${weather_entity_id}
+    attribute: apparent_temperature
     internal: True
   - platform: homeassistant
     id: current_allergy_index
-    entity_id: sensor.allergy_index_today
+    entity_id: ${allergy_index_entity_id}
     internal: True
 
   # daily temps
   - platform: homeassistant
     id: daily_tempAM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM0
     internal: true
   - platform: homeassistant
     id: daily_tempPM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM0
     internal: true
   - platform: homeassistant
     id: daily_tempAM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM1
     internal: true
   - platform: homeassistant
     id: daily_tempPM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM1
     internal: true
   - platform: homeassistant
     id: daily_tempAM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM2
     internal: true
   - platform: homeassistant
     id: daily_tempPM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM2
     internal: true
   - platform: homeassistant
     id: daily_tempAM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempAM3
     internal: true
   - platform: homeassistant
     id: daily_tempPM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: tempPM3
+    internal: true
+  - platform: homeassistant
+    id: daily_tempAM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: tempAM4
+    internal: true
+  - platform: homeassistant
+    id: daily_tempPM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: tempPM4
+    internal: true
+  - platform: homeassistant
+    id: daily_tempAM5
+    entity_id: ${daily_forecast_entity_id}
+    attribute: tempAM5
+    internal: true
+  - platform: homeassistant
+    id: daily_tempPM5
+    entity_id: ${daily_forecast_entity_id}
+    attribute: tempPM5
     internal: true
 
   # daily precip
   - platform: homeassistant
     id: daily_precipAM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM0
     internal: true
   - platform: homeassistant
     id: daily_precipPM0
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM0
     internal: true
   - platform: homeassistant
     id: daily_precipAM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM1
     internal: true
   - platform: homeassistant
     id: daily_precipPM1
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM1
     internal: true
   - platform: homeassistant
     id: daily_precipAM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM2
     internal: true
   - platform: homeassistant
     id: daily_precipPM2
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM2
     internal: true
   - platform: homeassistant
     id: daily_precipAM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipAM3
     internal: true
   - platform: homeassistant
     id: daily_precipPM3
-    entity_id: sensor.daily_forecast
+    entity_id: ${daily_forecast_entity_id}
     attribute: precipPM3
+    internal: true
+  - platform: homeassistant
+    id: daily_precipAM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precipAM4
+    internal: true
+  - platform: homeassistant
+    id: daily_precipPM4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precipPM4
+    internal: true
+  - platform: homeassistant
+    id: daily_precipAM5
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precipAM5
+    internal: true
+  - platform: homeassistant
+    id: daily_precipPM5
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precipPM5
+    internal: true
+
+  # daily forecast (single) - preferred when available
+  - platform: homeassistant
+    id: daily_high0
+    entity_id: ${daily_forecast_entity_id}
+    attribute: high0
+    internal: true
+  - platform: homeassistant
+    id: daily_low0
+    entity_id: ${daily_forecast_entity_id}
+    attribute: low0
+    internal: true
+  - platform: homeassistant
+    id: daily_precip0
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precip0
+    internal: true
+  - platform: homeassistant
+    id: daily_high1
+    entity_id: ${daily_forecast_entity_id}
+    attribute: high1
+    internal: true
+  - platform: homeassistant
+    id: daily_low1
+    entity_id: ${daily_forecast_entity_id}
+    attribute: low1
+    internal: true
+  - platform: homeassistant
+    id: daily_precip1
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precip1
+    internal: true
+  - platform: homeassistant
+    id: daily_high2
+    entity_id: ${daily_forecast_entity_id}
+    attribute: high2
+    internal: true
+  - platform: homeassistant
+    id: daily_low2
+    entity_id: ${daily_forecast_entity_id}
+    attribute: low2
+    internal: true
+  - platform: homeassistant
+    id: daily_precip2
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precip2
+    internal: true
+  - platform: homeassistant
+    id: daily_high3
+    entity_id: ${daily_forecast_entity_id}
+    attribute: high3
+    internal: true
+  - platform: homeassistant
+    id: daily_low3
+    entity_id: ${daily_forecast_entity_id}
+    attribute: low3
+    internal: true
+  - platform: homeassistant
+    id: daily_precip3
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precip3
+    internal: true
+  - platform: homeassistant
+    id: daily_high4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: high4
+    internal: true
+  - platform: homeassistant
+    id: daily_low4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: low4
+    internal: true
+  - platform: homeassistant
+    id: daily_precip4
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precip4
+    internal: true
+  - platform: homeassistant
+    id: daily_high5
+    entity_id: ${daily_forecast_entity_id}
+    attribute: high5
+    internal: true
+  - platform: homeassistant
+    id: daily_low5
+    entity_id: ${daily_forecast_entity_id}
+    attribute: low5
+    internal: true
+  - platform: homeassistant
+    id: daily_precip5
+    entity_id: ${daily_forecast_entity_id}
+    attribute: precip5
     internal: true
 
   # hourly temps
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp0
     id: hourly_temp0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp1
     id: hourly_temp1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp2
     id: hourly_temp2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp3
     id: hourly_temp3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp4
     id: hourly_temp4
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp5
     id: hourly_temp5
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp6
     id: hourly_temp6
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp7
     id: hourly_temp7
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp8
     id: hourly_temp8
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp9
     id: hourly_temp9
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp10
     id: hourly_temp10
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp11
     id: hourly_temp11
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp12
     id: hourly_temp12
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp13
     id: hourly_temp13
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp14
     id: hourly_temp14
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp15
     id: hourly_temp15
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp16
     id: hourly_temp16
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp17
     id: hourly_temp17
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp18
     id: hourly_temp18
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp19
     id: hourly_temp19
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp20
     id: hourly_temp20
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp21
     id: hourly_temp21
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp22
     id: hourly_temp22
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp23
     id: hourly_temp23
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: temp24
     id: hourly_temp24
     internal: true
 
   # hourly precips
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip0
     id: hourly_precip0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip1
     id: hourly_precip1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip2
     id: hourly_precip2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip3
     id: hourly_precip3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip4
     id: hourly_precip4
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip5
     id: hourly_precip5
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip6
     id: hourly_precip6
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip7
     id: hourly_precip7
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip8
     id: hourly_precip8
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip9
     id: hourly_precip9
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip10
     id: hourly_precip10
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip11
     id: hourly_precip11
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip12
     id: hourly_precip12
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip13
     id: hourly_precip13
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip14
     id: hourly_precip14
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip15
     id: hourly_precip15
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip16
     id: hourly_precip16
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip17
     id: hourly_precip17
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip18
     id: hourly_precip18
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip19
     id: hourly_precip19
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip20
     id: hourly_precip20
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip21
     id: hourly_precip21
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip22
     id: hourly_precip22
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip23
     id: hourly_precip23
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: precip24
     id: hourly_precip24
     internal: true
@@ -602,215 +729,285 @@ text_sensor:
   # current
   - platform: homeassistant
     id: current_condition
-    entity_id: weather.nws
+    entity_id: ${weather_entity_id}
     internal: True
   - platform: homeassistant
+    id: sun_state
+    entity_id: ${sun_entity_id}
+    internal: true
+  - platform: homeassistant
+    id: weather_friendly_name
+    entity_id: ${weather_entity_id}
+    attribute: friendly_name
+    internal: true
+  - platform: homeassistant
     id: current_dawn
-    entity_id: sensor.daily_sun_info
+    entity_id: ${sun_info_entity_id}
     attribute: dawn
     internal: True
   - platform: homeassistant
     id: current_dusk
-    entity_id: sensor.daily_sun_info
+    entity_id: ${sun_info_entity_id}
     attribute: dusk
     internal: True
   - platform: homeassistant
     id: current_allergy_rating
-    entity_id: sensor.allergy_index_today
+    entity_id: ${allergy_index_entity_id}
     attribute: rating
     internal: True
   - platform: homeassistant
     id: current_pollution_level
-    entity_id: sensor.u_s_air_pollution_level
+    entity_id: ${pollution_level_entity_id}
     internal: True
 
   # daily days
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day0
     id: daily_day0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day1
     id: daily_day1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day2
     id: daily_day2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: day3
     id: daily_day3
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: day4
+    id: daily_day4
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: day5
+    id: daily_day5
     internal: true
 
   # daily conditions
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
+    attribute: condition0
+    id: daily_condition0
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: condition1
+    id: daily_condition1
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: condition2
+    id: daily_condition2
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: condition3
+    id: daily_condition3
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: condition4
+    id: daily_condition4
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: condition5
+    id: daily_condition5
+    internal: true
+
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM0
     id: daily_conditionAM0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM0
     id: daily_conditionPM0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM1
     id: daily_conditionAM1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM1
     id: daily_conditionPM1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM2
     id: daily_conditionAM2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM2
     id: daily_conditionPM2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionAM3
     id: daily_conditionAM3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.daily_forecast 
+    entity_id: ${daily_forecast_entity_id}
     attribute: conditionPM3
     id: daily_conditionPM3
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: conditionAM4
+    id: daily_conditionAM4
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: conditionPM4
+    id: daily_conditionPM4
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: conditionAM5
+    id: daily_conditionAM5
+    internal: true
+  - platform: homeassistant
+    entity_id: ${daily_forecast_entity_id}
+    attribute: conditionPM5
+    id: daily_conditionPM5
     internal: true
 
   # hourly hours
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour0
     id: hourly_hour0
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour1
     id: hourly_hour1
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour2
     id: hourly_hour2
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour3
     id: hourly_hour3
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour4
     id: hourly_hour4
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour5
     id: hourly_hour5
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour6
     id: hourly_hour6
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour7
     id: hourly_hour7
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour8
     id: hourly_hour8
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour9
     id: hourly_hour9
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour10
     id: hourly_hour10
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour11
     id: hourly_hour11
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour12
     id: hourly_hour12
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour13
     id: hourly_hour13
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour14
     id: hourly_hour14
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour15
     id: hourly_hour15
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour16
     id: hourly_hour16
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour17
     id: hourly_hour17
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour18
     id: hourly_hour18
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour19
     id: hourly_hour19
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour20
     id: hourly_hour20
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour21
     id: hourly_hour21
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour22
     id: hourly_hour22
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour23
     id: hourly_hour23
     internal: true
   - platform: homeassistant
-    entity_id: sensor.hourly_forecast 
+    entity_id: ${hourly_forecast_entity_id}
     attribute: hour24
     id: hourly_hour24
     internal: true
@@ -841,8 +1038,59 @@ display:
       auto now = id(ha_time).now();
       struct tm timeinfo = now.to_c_tm();
 
+      // Clear the framebuffer every refresh so previously-rendered values
+      // (like "nan") don't stick around when data becomes unavailable.
+      it.fill(COLOR_OFF);
+
       // for use with font::Font::measure()
       int measWidth, measXOoffset, measBaseline, measHeight;
+
+      auto ok_float = [](float v) -> bool { return v == v; };  // NaN check
+
+      const bool is_night = id(sun_state).has_state()
+        ? (id(sun_state).state != "above_horizon")
+        : (timeinfo.tm_hour < 6 || timeinfo.tm_hour >= 18);
+
+      auto getConditionIcon = [is_night](const std::string &condition) -> const char* {
+        if (condition == "sunny") return is_night ? "\U000F0594" : "\U000F0599";
+        if (condition == "partlycloudy") return is_night ? "\U000F0F31" : "\U000F0595";
+        if (condition == "cloudy") return "\U000F0590";
+        if (condition == "rainy") return "\U000F0597";
+        if (condition == "snowy") return "\U000F0598";
+        if (condition == "pouring") return "\U000F0596";
+        if (condition == "lightning") return "\U000F0593";
+        if (condition == "clear-night") return "\U000F0594";
+        if (condition == "night-partlycloudy") return "\U000F0F31";
+        if (condition == "fog") return "\U000F0591";
+        if (condition == "hail") return "\U000F0592";
+        if (condition == "lightning-rainy") return "\U000F067E";
+        if (condition == "snowy-rainy") return "\U000F0F35";
+        if (condition == "windy") return "\U000F059D";
+        if (condition == "windy-variant") return "\U000F059E";
+        if (condition == "exceptional") return "\U000F0F2F";
+        return "\U000F0F2F";
+      };
+
+      auto getAllergyRatingShort = [](const std::string &rating) -> const char* {
+        // IQVIA ratings: Low, Low/Medium, Medium, Medium/High, High.
+        if (rating == "Low") return "Low";
+        if (rating == "Low/Medium") return "MedLow";
+        if (rating == "Medium") return "Med";
+        if (rating == "Medium/High") return "MedHigh";
+        if (rating == "High") return "High";
+        return "";
+      };
+
+      auto getPollutionLevelShort = [](const std::string &level) -> const char* {
+        // AirVisual enum values: good, moderate, unhealthy_sensitive, unhealthy, very_unhealthy, hazardous
+        if (level == "good") return "Good";
+        if (level == "moderate") return "Mod";
+        if (level == "unhealthy_sensitive") return "USG";
+        if (level == "unhealthy") return "Unh";
+        if (level == "very_unhealthy") return "VUnh";
+        if (level == "hazardous") return "Haz";
+        return "";
+      };
 
       // positions
       int left = 0;
@@ -852,7 +1100,21 @@ display:
 
       // Title/Subtitle
       // --------------------------------------------------------------------------------------------
-      const char* titleStr = "Canton, Georgia";
+      auto has_non_ws = [](const char* s) -> bool {
+        if (s == nullptr) return false;
+        for (; *s; s++) {
+          if (*s != ' ' && *s != '\t' && *s != '\r' && *s != '\n') return true;
+        }
+        return false;
+      };
+
+      // Prefer explicit location_name when provided, otherwise fall back to the weather entity's name.
+      const char* titleStr = "${location_name}";
+      if (!has_non_ws(titleStr)) {
+        if (id(weather_friendly_name).has_state() && !id(weather_friendly_name).state.empty()) {
+          titleStr = id(weather_friendly_name).state.c_str();
+        }
+      }
       id(font_40_bold).measure(titleStr, &measWidth, &measXOoffset, &measBaseline, &measHeight);
       it.printf(right, top-measHeight+measBaseline, id(font_40_bold), TextAlign::TOP_RIGHT, titleStr);
       char dateStr[32];
@@ -910,27 +1172,93 @@ display:
 
       // Daily
       // --------------------------------------------------------------------------------------------
-      std::string daily_days[4]         = { id(daily_day0).state, id(daily_day1).state, id(daily_day2).state, id(daily_day3).state };
-      std::string daily_conditionsAM[4] = { id(daily_conditionAM0).state, id(daily_conditionAM1).state, id(daily_conditionAM2).state, id(daily_conditionAM3).state };
-      std::string daily_conditionsPM[4] = { id(daily_conditionPM0).state, id(daily_conditionPM1).state, id(daily_conditionPM2).state, id(daily_conditionPM3).state };
-      float daily_tempsAM[4]            = { id(daily_tempAM0).state, id(daily_tempAM1).state, id(daily_tempAM2).state, id(daily_tempAM3).state };
-      float daily_tempsPM[4]            = { id(daily_tempPM0).state, id(daily_tempPM1).state, id(daily_tempPM2).state, id(daily_tempPM3).state };
-      float daily_precipsAM[4]          = { id(daily_precipAM0).state, id(daily_precipAM1).state, id(daily_precipAM2).state, id(daily_precipAM3).state };
-      float daily_precipsPM[4]          = { id(daily_precipPM0).state, id(daily_precipPM1).state, id(daily_precipPM2).state, id(daily_precipPM3).state };
+      std::string daily_days[6]         = { id(daily_day0).state, id(daily_day1).state, id(daily_day2).state, id(daily_day3).state, id(daily_day4).state, id(daily_day5).state };
+      const bool daily_v2 = id(daily_condition0).has_state()
+        && ok_float(id(daily_high0).state)
+        && ok_float(id(daily_low0).state)
+        && ok_float(id(daily_precip0).state);
+
+      // Nudge daily tiles upward so the precip text doesn't collide with the hourly plot.
+      id(font_16).measure("0", &measWidth, &measXOoffset, &measBaseline, &measHeight);
+      const int daily_tile_y_shift = measHeight;
+
       bool freeze_warning = false;
-      for (int i = 0; i < 4; i++) {
-        it.printf(355+i*125,  90, id(font_30_bold),      TextAlign::CENTER, "%s", daily_days[i].c_str());
-        it.printf(325+i*125, 115, id(font_20),      TextAlign::CENTER, "AM");
-        it.printf(385+i*125, 115, id(font_20),      TextAlign::CENTER, "PM");
-        it.printf(325+i*125, 150, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(daily_conditionsAM[i]));
-        it.printf(385+i*125, 150, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(daily_conditionsPM[i]));
-        it.printf(325+i*125, 180, id(font_16),      TextAlign::CENTER, "%.0f° %.0f%%", daily_tempsAM[i], daily_precipsAM[i]);
-        it.printf(385+i*125, 180, id(font_16),      TextAlign::CENTER, "%.0f° %.0f%%", daily_tempsPM[i], daily_precipsPM[i]);
-        if (!freeze_warning && (daily_tempsAM[i] <= 32 || daily_tempsPM[i] <= 32)) {
-          freeze_warning = true;
+      const bool daily_compat = id(daily_conditionAM0).has_state()
+        && id(daily_conditionPM0).has_state()
+        && ok_float(id(daily_tempAM0).state)
+        && ok_float(id(daily_tempPM0).state)
+        && ok_float(id(daily_precipAM0).state)
+        && ok_float(id(daily_precipPM0).state);
+
+      const bool daily_has_data = daily_v2 || daily_compat;
+      if (!daily_has_data) {
+        it.printf(542, 135, id(font_20), TextAlign::CENTER, "Missing Home Assistant templates");
+        it.printf(542, 160, id(font_16), TextAlign::CENTER, "Install: home-assistant-e1001-templates.yaml");
+        it.printf(542, 180, id(font_16), TextAlign::CENTER, "See README: Home Assistant template sensors");
+      } else if (daily_v2) {
+        std::string daily_conditions[6] = { id(daily_condition0).state, id(daily_condition1).state, id(daily_condition2).state, id(daily_condition3).state, id(daily_condition4).state, id(daily_condition5).state };
+        float daily_highs[6]            = { id(daily_high0).state, id(daily_high1).state, id(daily_high2).state, id(daily_high3).state, id(daily_high4).state, id(daily_high5).state };
+        float daily_lows[6]             = { id(daily_low0).state, id(daily_low1).state, id(daily_low2).state, id(daily_low3).state, id(daily_low4).state, id(daily_low5).state };
+        float daily_precips[6]          = { id(daily_precip0).state, id(daily_precip1).state, id(daily_precip2).state, id(daily_precip3).state, id(daily_precip4).state, id(daily_precip5).state };
+
+        const int daily_tile_base_x = 305;
+        const int daily_tile_step_x = 90;
+        for (int i = 0; i < 6; i++) {
+          const int daily_tile_x = daily_tile_base_x + i * daily_tile_step_x;
+          if (!daily_days[i].empty()) {
+            it.printf(daily_tile_x,  90, id(font_30_bold), TextAlign::CENTER, "%s", daily_days[i].c_str());
+          }
+          if (!daily_conditions[i].empty()) {
+            it.printf(daily_tile_x, 150 - daily_tile_y_shift, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(daily_conditions[i]));
+          }
+          if (ok_float(daily_highs[i]) && ok_float(daily_lows[i])) {
+            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", daily_highs[i], daily_lows[i]);
+          }
+          if (ok_float(daily_precips[i])) {
+            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f%%", daily_precips[i]);
+          }
+
+          if (!freeze_warning && ok_float(daily_lows[i]) && (daily_lows[i] <= 32)) {
+            freeze_warning = true;
+          }
+        }
+      } else {
+        // Back-compat: collapse twice-daily (AM/PM) into a single daily summary.
+        std::string daily_conditionsAM[6] = { id(daily_conditionAM0).state, id(daily_conditionAM1).state, id(daily_conditionAM2).state, id(daily_conditionAM3).state, id(daily_conditionAM4).state, id(daily_conditionAM5).state };
+        std::string daily_conditionsPM[6] = { id(daily_conditionPM0).state, id(daily_conditionPM1).state, id(daily_conditionPM2).state, id(daily_conditionPM3).state, id(daily_conditionPM4).state, id(daily_conditionPM5).state };
+        float daily_tempsAM[6]            = { id(daily_tempAM0).state, id(daily_tempAM1).state, id(daily_tempAM2).state, id(daily_tempAM3).state, id(daily_tempAM4).state, id(daily_tempAM5).state };
+        float daily_tempsPM[6]            = { id(daily_tempPM0).state, id(daily_tempPM1).state, id(daily_tempPM2).state, id(daily_tempPM3).state, id(daily_tempPM4).state, id(daily_tempPM5).state };
+        float daily_precipsAM[6]          = { id(daily_precipAM0).state, id(daily_precipAM1).state, id(daily_precipAM2).state, id(daily_precipAM3).state, id(daily_precipAM4).state, id(daily_precipAM5).state };
+        float daily_precipsPM[6]          = { id(daily_precipPM0).state, id(daily_precipPM1).state, id(daily_precipPM2).state, id(daily_precipPM3).state, id(daily_precipPM4).state, id(daily_precipPM5).state };
+
+        const int daily_tile_base_x = 305;
+        const int daily_tile_step_x = 90;
+        for (int i = 0; i < 6; i++) {
+          const int daily_tile_x = daily_tile_base_x + i * daily_tile_step_x;
+          const float high_temp = daily_tempsAM[i] > daily_tempsPM[i] ? daily_tempsAM[i] : daily_tempsPM[i];
+          const float low_temp = daily_tempsAM[i] < daily_tempsPM[i] ? daily_tempsAM[i] : daily_tempsPM[i];
+          const float precip_chance = daily_precipsAM[i] > daily_precipsPM[i] ? daily_precipsAM[i] : daily_precipsPM[i];
+          const std::string &day_condition = (daily_precipsPM[i] >= daily_precipsAM[i]) ? daily_conditionsPM[i] : daily_conditionsAM[i];
+
+          if (!daily_days[i].empty()) {
+            it.printf(daily_tile_x,  90, id(font_30_bold), TextAlign::CENTER, "%s", daily_days[i].c_str());
+          }
+          if (!day_condition.empty()) {
+            it.printf(daily_tile_x, 150 - daily_tile_y_shift, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(day_condition));
+          }
+          if (ok_float(high_temp) && ok_float(low_temp)) {
+            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", high_temp, low_temp);
+          }
+          if (ok_float(precip_chance)) {
+            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f%%", precip_chance);
+          }
+
+          if (!freeze_warning && ok_float(low_temp) && (low_temp <= 32)) {
+            freeze_warning = true;
+          }
         }
       }
-      if (freeze_warning) {
+      if (daily_has_data && freeze_warning) {
         it.printf(345, 40, id(font_30_bold), TextAlign::BOTTOM_CENTER, "Freeze");
         it.printf(345, 20, id(font_30_bold), TextAlign::TOP_CENTER, "Warning");
         it.rectangle(280,0,130,65);
@@ -939,6 +1267,10 @@ display:
 
       // Hourly
       // --------------------------------------------------------------------------------------------
+      const bool hourly_has_data = id(hourly_hour0).has_state()
+        && ok_float(id(hourly_temp0).state)
+        && ok_float(id(hourly_precip0).state);
+
       std::string hourly_hours[25] = {
         id(hourly_hour0).state, id(hourly_hour1).state, id(hourly_hour2).state,
         id(hourly_hour3).state, id(hourly_hour4).state, id(hourly_hour5).state,
@@ -972,71 +1304,162 @@ display:
         id(hourly_precip21).state, id(hourly_precip22).state, id(hourly_precip23).state,
         id(hourly_precip24).state,
       };
-      for (int i = 0; i < 6; i++) {
-        it.printf(310, 410-i*40, id(font_16), TextAlign::CENTER_RIGHT, "%d°", i*20);
-        it.line(312, 410-i*40, 748, 410-i*40);
-        it.printf(750, 410-i*40, id(font_16), TextAlign::CENTER_LEFT, "%d%%", i*20);
-      }
-      it.line(312, 409, 748, 409);
-      it.line(312, 411, 748, 411);
-      for (int i = 1; i < 24; i++) {
-        it.rectangle(314+i*18-3, 410-hourly_precips[i]/100*40*5, 7, hourly_precips[i]/100*40*5);
-      }
-      for (int i = 0; i < 25; i++) {
-        if (0 == i%3) {
-          it.line(314+i*18, 410, 314+i*18, 415);
-          it.printf(314+i*18, 415, id(font_16), TextAlign::TOP_CENTER, "%s", hourly_hours[i].c_str());
+      if (!hourly_has_data) {
+        it.printf(531, 340, id(font_20), TextAlign::CENTER, "Hourly forecast unavailable");
+        it.printf(531, 365, id(font_16), TextAlign::CENTER, "Install HA templates (README)");
+      } else {
+        for (int i = 0; i < 6; i++) {
+          it.printf(310, 410-i*40, id(font_16), TextAlign::CENTER_RIGHT, "%d°", i*20);
+          it.line(312, 410-i*40, 748, 410-i*40);
+          it.printf(750, 410-i*40, id(font_16), TextAlign::CENTER_LEFT, "%d%%", i*20);
         }
-        if (i > 0) {
-          it.line(314+(i-1)*18, 407-hourly_temps[i-1]/100*40*5, 314+i*18, 407-hourly_temps[i]/100*40*5);
-          it.line(314+(i-1)*18, 408-hourly_temps[i-1]/100*40*5, 314+i*18, 408-hourly_temps[i]/100*40*5);
-          it.line(314+(i-1)*18, 409-hourly_temps[i-1]/100*40*5, 314+i*18, 409-hourly_temps[i]/100*40*5);
-          it.line(314+(i-1)*18, 410-hourly_temps[i-1]/100*40*5, 314+i*18, 410-hourly_temps[i]/100*40*5);
-          it.line(314+(i-1)*18, 411-hourly_temps[i-1]/100*40*5, 314+i*18, 411-hourly_temps[i]/100*40*5);
+        it.line(312, 409, 748, 409);
+        it.line(312, 411, 748, 411);
+        for (int i = 1; i < 24; i++) {
+          it.rectangle(314+i*18-3, 410-hourly_precips[i]/100*40*5, 7, hourly_precips[i]/100*40*5);
         }
+        for (int i = 0; i < 25; i++) {
+          if (0 == i%3) {
+            it.line(314+i*18, 410, 314+i*18, 415);
+            it.printf(314+i*18, 415, id(font_16), TextAlign::TOP_CENTER, "%s", hourly_hours[i].c_str());
+          }
+          if (i > 0) {
+            it.line(314+(i-1)*18, 407-hourly_temps[i-1]/100*40*5, 314+i*18, 407-hourly_temps[i]/100*40*5);
+            it.line(314+(i-1)*18, 408-hourly_temps[i-1]/100*40*5, 314+i*18, 408-hourly_temps[i]/100*40*5);
+            it.line(314+(i-1)*18, 409-hourly_temps[i-1]/100*40*5, 314+i*18, 409-hourly_temps[i]/100*40*5);
+            it.line(314+(i-1)*18, 410-hourly_temps[i-1]/100*40*5, 314+i*18, 410-hourly_temps[i]/100*40*5);
+            it.line(314+(i-1)*18, 411-hourly_temps[i-1]/100*40*5, 314+i*18, 411-hourly_temps[i]/100*40*5);
+          }
+        }
+        it.filled_rectangle(314, 450, 10, 5); it.printf(328, 452, id(font_16), TextAlign::CENTER_LEFT, "Temperature (°F)");
+        it.rectangle(314, 468, 10, 10); it.printf(328, 472, id(font_16), TextAlign::CENTER_LEFT, "Chance of Rain (%%)");
       }
-      it.filled_rectangle(314, 450, 10, 5); it.printf(328, 452, id(font_16), TextAlign::CENTER_LEFT, "Temperature (°F)");
-      it.rectangle(314, 468, 10, 10); it.printf(328, 472, id(font_16), TextAlign::CENTER_LEFT, "Chance of Rain (%%)");
 
       // Current
       // --------------------------------------------------------------------------------------------
       it.printf(0, 0, id(font_icon_100), TextAlign::TOP_LEFT, "%s", getConditionIcon(id(current_condition).state));
-      it.printf(100, -5, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
-      it.printf(100, 60, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
+      if (id(current_temp).has_state() && ok_float(id(current_temp).state)) {
+        it.printf(100, -5, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
+      }
+      auto pretty_condition = [](const std::string &cond) -> std::string {
+        if (cond.empty()) return "";
+        if (cond == "clear-night") return "Clear";
+        if (cond == "night-partlycloudy") return "Partly Cloudy";
+        if (cond == "partlycloudy") return "Partly Cloudy";
+        if (cond == "windy-variant") return "Windy";
+        if (cond == "lightning-rainy") return "Lightning Rain";
+        if (cond == "snowy-rainy") return "Wintry Mix";
+
+        std::string out;
+        out.reserve(cond.size() + 8);
+        bool cap_next = true;
+        for (char ch : cond) {
+          if (ch == '-' || ch == '_' || ch == ' ') {
+            out.push_back(' ');
+            cap_next = true;
+            continue;
+          }
+          if (cap_next) {
+            if (ch >= 'a' && ch <= 'z') out.push_back(static_cast<char>(ch - 'a' + 'A'));
+            else out.push_back(ch);
+            cap_next = false;
+            continue;
+          }
+          if (ch >= 'A' && ch <= 'Z') out.push_back(static_cast<char>(ch - 'A' + 'a'));
+          else out.push_back(ch);
+        }
+        return out;
+      };
+
+      if (id(current_condition).has_state() && !id(current_condition).state.empty()) {
+        const std::string cond_str = pretty_condition(id(current_condition).state);
+        if (!cond_str.empty()) {
+          it.printf(100, 60, id(font_20), TextAlign::TOP_LEFT, "%s", cond_str.c_str());
+        }
+      }
+      if (id(current_apparent_temp).has_state() && ok_float(id(current_apparent_temp).state)) {
+        it.printf(100, 82, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
+      }
 
       it.printf(0, 115, id(font_icon_50), "\U000F059D"); // wind
       it.printf(50, 112, id(font_20), "Wind");
-      it.printf(50, 135, id(font_22_bold), "%.0fmph", id(current_wind_speed).state);
+      if (id(current_wind_speed).has_state() && ok_float(id(current_wind_speed).state)) {
+        it.printf(50, 135, id(font_22_bold), "%.0fmph", id(current_wind_speed).state);
+      }
       it.printf(140, 115, id(font_icon_50), "\U000F058E"); // water-percent
       it.printf(190, 112, id(font_20), "Humidity");
-      it.printf(190, 135, id(font_22_bold), "%.0f%%", id(current_humidity).state);
+      if (id(current_humidity).has_state() && ok_float(id(current_humidity).state)) {
+        it.printf(190, 135, id(font_22_bold), "%.0f%%", id(current_humidity).state);
+      }
 
       it.printf(0, 180, id(font_icon_50), "\U000F0875"); // gauge-low
       it.printf(50, 177, id(font_20), "Pressure");
-      it.printf(50, 200, id(font_22_bold), "%.0finHg", id(current_pressure).state);
+      if (id(current_pressure).has_state() && ok_float(id(current_pressure).state)) {
+        it.printf(50, 200, id(font_22_bold), "%.0finHg", id(current_pressure).state);
+      }
       it.printf(140, 180, id(font_icon_50), "\U000F0208"); // eye
       it.printf(190, 177, id(font_20), "Visibility");
-      it.printf(190, 200, id(font_22_bold), "%.0fmi", id(current_visibility).state);
+      if (id(current_visibility).has_state() && ok_float(id(current_visibility).state)) {
+        it.printf(190, 200, id(font_22_bold), "%.0fmi", id(current_visibility).state);
+      }
 
-      it.printf(0, 245, id(font_icon_50), "\U000F1885"); // flower-pollen
-      it.printf(50, 242, id(font_20), "Allergy");
-      it.printf(50, 265, id(font_22_bold), "%.0f (%s)", id(current_allergy_index).state, id(current_allergy_rating).state.c_str());
-      it.printf(140, 245, id(font_icon_50), "\U000F0A71"); // smog
-      it.printf(190, 242, id(font_20), "Pollution");
-      it.printf(190, 265, id(font_22_bold), "%s", id(current_pollution_level).state.c_str());
+      auto has_non_ws = [](const char* s) -> bool {
+        if (s == nullptr) return false;
+        while (*s) {
+          if (!isspace(static_cast<unsigned char>(*s))) return true;
+          s++;
+        }
+        return false;
+      };
+
+      const bool show_allergy = has_non_ws("${allergy_index_entity_id}")
+        && id(current_allergy_index).has_state()
+        && id(current_allergy_rating).has_state();
+      const bool show_pollution = has_non_ws("${pollution_level_entity_id}")
+        && id(current_pollution_level).has_state();
+
+      if (show_allergy) {
+        it.printf(0, 245, id(font_icon_50), "\U000F1885"); // flower-pollen
+        it.printf(50, 242, id(font_20), "Allergy");
+        it.printf(50, 265, id(font_22_bold), "%s", getAllergyRatingShort(id(current_allergy_rating).state));
+      }
+
+      if (show_pollution) {
+        const int x_icon = show_allergy ? 140 : 0;
+        const int x_text = show_allergy ? 190 : 50;
+        it.printf(x_icon, 245, id(font_icon_50), "\U000F0A71"); // smog
+        it.printf(x_text, 242, id(font_20), "Pollution");
+        it.printf(x_text, 265, id(font_22_bold), "%s", getPollutionLevelShort(id(current_pollution_level).state));
+      }
 
       it.printf(0, 310, id(font_icon_50), "\U000F059C"); // sunrise
       it.printf(50, 307, id(font_20), "Dawn");
-      it.printf(50, 330, id(font_22_bold), "%s", id(current_dawn).state.c_str());
+      if (id(current_dawn).has_state() && !id(current_dawn).state.empty()) {
+        std::string dawn_str = id(current_dawn).state;
+        if (!dawn_str.empty() && dawn_str[0] == '0') dawn_str.erase(0, 1);
+        it.printf(50, 330, id(font_22_bold), "%s", dawn_str.c_str());
+      } else {
+        it.printf(50, 330, id(font_22_bold), "--");
+      }
       it.printf(140, 310, id(font_icon_50), "\U000F059B"); // sunset
       it.printf(190, 307, id(font_20), "Dusk");
-      it.printf(190, 330, id(font_22_bold), "%s", id(current_dusk).state.c_str());
+      if (id(current_dusk).has_state() && !id(current_dusk).state.empty()) {
+        std::string dusk_str = id(current_dusk).state;
+        if (!dusk_str.empty() && dusk_str[0] == '0') dusk_str.erase(0, 1);
+        it.printf(190, 330, id(font_22_bold), "%s", dusk_str.c_str());
+      } else {
+        it.printf(190, 330, id(font_22_bold), "--");
+      }
       
       it.printf(140, 420, id(font_30_bold), TextAlign::BOTTOM_CENTER, "Inside");
       it.rectangle(0, 415, 280, 2);
       it.printf(0, 425, id(font_icon_50), "\U000F050F"); // thermometer
       it.printf(45, 422, id(font_20), "Temp");
-      it.printf(45, 445, id(font_22_bold), "%.0f°F", id(sht4x_temp).state * 9.0/5.0 + 32.0);
+      if (id(sht4x_temp).has_state() && ok_float(id(sht4x_temp).state)) {
+        it.printf(45, 445, id(font_22_bold), "%.0f°F", id(sht4x_temp).state * 9.0/5.0 + 32.0);
+      }
       it.printf(140, 425, id(font_icon_50), "\U000F058E"); // water-percent
       it.printf(185, 422, id(font_20), "Humidity");
-      it.printf(185, 445, id(font_22_bold), "%.0f%%", id(sht4x_hum).state);
+      if (id(sht4x_hum).has_state() && ok_float(id(sht4x_hum).state)) {
+        it.printf(185, 445, id(font_22_bold), "%.0f%%", id(sht4x_hum).state);
+      }
