@@ -54,11 +54,25 @@ substitutions:
   location_name: "Canton, Georgia"
 
   weather_entity_id: "weather.nws"
-  daily_forecast_entity_id: "sensor.daily_forecast"
-  hourly_forecast_entity_id: "sensor.hourly_forecast"
-  sun_info_entity_id: "sensor.daily_sun_info"
-  apparent_temp_entity_id: "sensor.apparent_temperature"
+  daily_forecast_entity_id: "sensor.e1001_daily_forecast"
+  hourly_forecast_entity_id: "sensor.e1001_hourly_forecast"
+  sun_info_entity_id: "sensor.e1001_sun_info"
   allergy_index_entity_id: "sensor.allergy_index_today"
   pollution_level_entity_id: "sensor.u_s_air_pollution_level"
 ```
 
+## Home Assistant template sensors (forecast)
+
+ESPHome can’t directly consume the `weather.get_forecasts` service response, so the recommended approach is a small Home Assistant Template that flattens the forecast into simple sensor attributes.
+
+- **Template file**: `home-assistant-e1001-templates.yaml`
+- **What it creates**:
+  - `sensor.e1001_daily_forecast` (attributes `day0..3`, `condition0..3`, `high0..3`, `low0..3`, `precip0..3`)
+  - `sensor.e1001_hourly_forecast` (attributes `hour0..12`, `temp0..12`, `precip0..12`)
+  - `sensor.e1001_sun_info` (attributes `dawn`, `dusk`)
+
+To use it:
+
+- Copy/paste the contents into your HA `templates.yaml`
+- Replace every `weather.pirateweather` in that file with your weather entity (e.g. `weather.nws`)
+- Restart Home Assistant (or reload Templates)
