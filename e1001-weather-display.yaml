@@ -600,6 +600,11 @@ text_sensor:
     entity_id: ${weather_entity_id}
     internal: True
   - platform: homeassistant
+    id: weather_friendly_name
+    entity_id: ${weather_entity_id}
+    attribute: friendly_name
+    internal: true
+  - platform: homeassistant
     id: current_dawn
     entity_id: ${sun_info_entity_id}
     attribute: dawn
@@ -889,6 +894,9 @@ display:
       // Title/Subtitle
       // --------------------------------------------------------------------------------------------
       const char* titleStr = "${location_name}";
+      if (id(weather_friendly_name).has_state() && !id(weather_friendly_name).state.empty()) {
+        titleStr = id(weather_friendly_name).state.c_str();
+      }
       id(font_40_bold).measure(titleStr, &measWidth, &measXOoffset, &measBaseline, &measHeight);
       it.printf(right, top-measHeight+measBaseline, id(font_40_bold), TextAlign::TOP_RIGHT, titleStr);
       char dateStr[32];
@@ -1064,7 +1072,7 @@ display:
       if (show_allergy) {
         it.printf(0, 245, id(font_icon_50), "\U000F1885"); // flower-pollen
         it.printf(50, 242, id(font_20), "Allergy");
-        it.printf(50, 265, id(font_22_bold), "%.0f %s", id(current_allergy_index).state, getAllergyRatingShort(id(current_allergy_rating).state));
+        it.printf(50, 265, id(font_22_bold), "%s", getAllergyRatingShort(id(current_allergy_rating).state));
       }
 
       if (show_pollution) {
