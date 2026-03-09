@@ -10,7 +10,7 @@
 #
 # Notes:
 # - This uses the `weather.get_forecasts` service and flattens the response into simple attributes.
-# - The ESPHome package expects (daily): `day0..day4`, `condition0..condition4`, `high0..high4`, `low0..low4`, `precip0..precip4`
+# - The ESPHome package expects (daily): `day0..day5`, `condition0..condition5`, `high0..high5`, `low0..low5`, `precip0..precip5`
 # - The ESPHome package expects (hourly): `hour0..hour24`, `temp0..temp24`, `precip0..precip24`
 #
 # Home Assistant 2025.2+ syntax is assumed.
@@ -42,7 +42,7 @@
       unique_id: e1001_daily_forecast
       state: "{{ now().isoformat() }}"
       attributes:
-        # 5-day forecast
+        # 6-day forecast
         day0: >
           {% set dt = as_datetime(e1001_daily[e1001_weather_entity].forecast[0].datetime) %}
           {{ dt.strftime('%a') }}
@@ -82,6 +82,14 @@
         high4: "{{ e1001_daily[e1001_weather_entity].forecast[4].temperature | float(none) }}"
         low4: "{{ e1001_daily[e1001_weather_entity].forecast[4].templow | float(none) }}"
         precip4: "{{ e1001_daily[e1001_weather_entity].forecast[4].precipitation_probability | float(0) }}"
+
+        day5: >
+          {% set dt = as_datetime(e1001_daily[e1001_weather_entity].forecast[5].datetime) %}
+          {{ dt.strftime('%a') }}
+        condition5: "{{ e1001_daily[e1001_weather_entity].forecast[5].condition }}"
+        high5: "{{ e1001_daily[e1001_weather_entity].forecast[5].temperature | float(none) }}"
+        low5: "{{ e1001_daily[e1001_weather_entity].forecast[5].templow | float(none) }}"
+        precip5: "{{ e1001_daily[e1001_weather_entity].forecast[5].precipitation_probability | float(0) }}"
 
     - name: e1001_hourly_forecast
       unique_id: e1001_hourly_forecast
@@ -252,6 +260,10 @@
       unique_id: e1001_sun_info
       state: "{{ now().isoformat() }}"
       attributes:
-        dawn: "{{ as_timestamp(state_attr(e1001_sun_entity,'next_dawn')) | timestamp_custom('%I:%M%p', True) }}"
-        dusk: "{{ as_timestamp(state_attr(e1001_sun_entity,'next_dusk')) | timestamp_custom('%I:%M%p', True) }}"
+        dawn: >
+          {% set t = as_timestamp(state_attr(e1001_sun_entity,'next_dawn')) | timestamp_custom('%I:%M%p', True) %}
+          {{ t[1:] if t.startswith('0') else t }}
+        dusk: >
+          {% set t = as_timestamp(state_attr(e1001_sun_entity,'next_dusk')) | timestamp_custom('%I:%M%p', True) %}
+          {{ t[1:] if t.startswith('0') else t }}
 

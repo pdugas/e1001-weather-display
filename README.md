@@ -67,7 +67,7 @@ ESPHome can’t directly consume the `weather.get_forecasts` service response, s
 
 - **Template file**: `home-assistant-e1001-templates.yaml`
 - **What it creates**:
-  - `sensor.e1001_daily_forecast` (attributes `day0..4`, `condition0..4`, `high0..4`, `low0..4`, `precip0..4`)
+  - `sensor.e1001_daily_forecast` (attributes `day0..5`, `condition0..5`, `high0..5`, `low0..5`, `precip0..5`)
   - `sensor.e1001_hourly_forecast` (attributes `hour0..24`, `temp0..24`, `precip0..24`)
   - `sensor.e1001_sun_info` (attributes `dawn`, `dusk`)
 
