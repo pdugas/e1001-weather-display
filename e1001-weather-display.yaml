@@ -1340,9 +1340,9 @@ display:
 
       // Current
       // --------------------------------------------------------------------------------------------
-      it.printf(0, 57, id(font_icon_100), TextAlign::CENTER_LEFT, "%s", getConditionIcon(id(current_condition).state));
+      it.printf(0, 3, id(font_icon_100), TextAlign::TOP_LEFT, "%s", getConditionIcon(id(current_condition).state));
       if (id(current_temp).has_state() && ok_float(id(current_temp).state)) {
-        it.printf(100, 5, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
+        it.printf(100, 0, id(font_60_bold), TextAlign::TOP_LEFT, "%.0f°F", id(current_temp).state);
       }
       auto pretty_condition = [](const std::string &cond) -> std::string {
         if (cond.empty()) return "";
@@ -1377,11 +1377,11 @@ display:
       if (id(current_condition).has_state() && !id(current_condition).state.empty()) {
         const std::string cond_str = pretty_condition(id(current_condition).state);
         if (!cond_str.empty()) {
-          it.printf(100, 70, id(font_20), TextAlign::TOP_LEFT, "%s", cond_str.c_str());
+          it.printf(100, 62, id(font_20), TextAlign::TOP_LEFT, "%s", cond_str.c_str());
         }
       }
       if (id(current_apparent_temp).has_state() && ok_float(id(current_apparent_temp).state)) {
-        it.printf(100, 92, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
+        it.printf(100, 84, id(font_20), TextAlign::TOP_LEFT, "Feels like %.0f°F", id(current_apparent_temp).state);
       }
 
       it.printf(0, 115, id(font_icon_50), "\U000F059D"); // wind
