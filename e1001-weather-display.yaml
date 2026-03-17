@@ -54,6 +54,9 @@ font:
     id: font_22_bold
     size: 22
   - file: "gfonts://Kanit"
+    id: font_18
+    size: 18
+  - file: "gfonts://Kanit"
     id: font_16
     size: 16
 
@@ -1201,8 +1204,8 @@ display:
         float daily_lows[6]             = { id(daily_low0).state, id(daily_low1).state, id(daily_low2).state, id(daily_low3).state, id(daily_low4).state, id(daily_low5).state };
         float daily_precips[6]          = { id(daily_precip0).state, id(daily_precip1).state, id(daily_precip2).state, id(daily_precip3).state, id(daily_precip4).state, id(daily_precip5).state };
 
-        const int daily_tile_base_x = 305;
-        const int daily_tile_step_x = 90;
+        const int daily_tile_base_x = 354;
+        const int daily_tile_step_x = 74;
         for (int i = 0; i < 6; i++) {
           const int daily_tile_x = daily_tile_base_x + i * daily_tile_step_x;
           if (!daily_days[i].empty()) {
@@ -1212,10 +1215,10 @@ display:
             it.printf(daily_tile_x, 150 - daily_tile_y_shift, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(daily_conditions[i]));
           }
           if (ok_float(daily_highs[i]) && ok_float(daily_lows[i])) {
-            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", daily_highs[i], daily_lows[i]);
+            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_18), TextAlign::CENTER, "%.0f°/%.0f°", daily_highs[i], daily_lows[i]);
           }
           if (ok_float(daily_precips[i])) {
-            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f%%", daily_precips[i]);
+            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_18), TextAlign::CENTER, "%.0f%%", daily_precips[i]);
           }
 
           if (!freeze_warning && ok_float(daily_lows[i]) && (daily_lows[i] <= 32)) {
@@ -1231,8 +1234,8 @@ display:
         float daily_precipsAM[6]          = { id(daily_precipAM0).state, id(daily_precipAM1).state, id(daily_precipAM2).state, id(daily_precipAM3).state, id(daily_precipAM4).state, id(daily_precipAM5).state };
         float daily_precipsPM[6]          = { id(daily_precipPM0).state, id(daily_precipPM1).state, id(daily_precipPM2).state, id(daily_precipPM3).state, id(daily_precipPM4).state, id(daily_precipPM5).state };
 
-        const int daily_tile_base_x = 305;
-        const int daily_tile_step_x = 90;
+        const int daily_tile_base_x = 354;
+        const int daily_tile_step_x = 74;
         for (int i = 0; i < 6; i++) {
           const int daily_tile_x = daily_tile_base_x + i * daily_tile_step_x;
           const float high_temp = daily_tempsAM[i] > daily_tempsPM[i] ? daily_tempsAM[i] : daily_tempsPM[i];
@@ -1247,10 +1250,10 @@ display:
             it.printf(daily_tile_x, 150 - daily_tile_y_shift, id(font_icon_50), TextAlign::CENTER, "%s", getConditionIcon(day_condition));
           }
           if (ok_float(high_temp) && ok_float(low_temp)) {
-            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f°/%.0f°", high_temp, low_temp);
+            it.printf(daily_tile_x, 185 - daily_tile_y_shift, id(font_18), TextAlign::CENTER, "%.0f°/%.0f°", high_temp, low_temp);
           }
           if (ok_float(precip_chance)) {
-            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_16), TextAlign::CENTER, "%.0f%%", precip_chance);
+            it.printf(daily_tile_x, 205 - daily_tile_y_shift, id(font_18), TextAlign::CENTER, "%.0f%%", precip_chance);
           }
 
           if (!freeze_warning && ok_float(low_temp) && (low_temp <= 32)) {
